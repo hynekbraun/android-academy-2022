@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.strv.movies.ui.login.LogInScreen
 import com.strv.movies.ui.moviedetail.MovieDetailScreen
 import com.strv.movies.ui.movieslist.MoviesListScreen
 
@@ -17,14 +18,13 @@ fun MoviesNavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = MoviesDestinations.MOVIES_LIST_ROUTE
+        startDestination = MoviesDestinations.LOGIN_ROUTE
     ) {
         composable(MoviesDestinations.MOVIES_LIST_ROUTE) {
             MoviesListScreen(
                 navigateToMovieDetail = { movieId ->
                     navController.navigate("${MoviesDestinations.MOVIE_DETAIL_ROUTE}/$movieId")
-                },
-                viewModel = hiltViewModel()
+                }
             )
         }
 
@@ -36,7 +36,16 @@ fun MoviesNavGraph(
                 }
             )
         ) {
-            MovieDetailScreen(viewModel = hiltViewModel())
+            MovieDetailScreen()
+        }
+        composable(
+            route = MoviesDestinations.LOGIN_ROUTE
+        ) {
+            LogInScreen(
+                onLoginClick = {
+                    navController.navigate(MoviesDestinations.MOVIES_LIST_ROUTE)
+                }
+            )
         }
     }
 }

@@ -40,37 +40,36 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            LogInScreen()
-//            val viewModel by assistedViewModel {
-//                mainViewModelFactory.create(it, isSystemInDarkTheme())
-//            }
-//
-//            val isDarkTheme by viewModel.isDarkTheme.collectAsState()
-//            changeStatusBarColor(isDarkTheme)
-//
-//            MoviesTheme(useDarkTheme = isDarkTheme) {
-//                // A surface container using the 'background' color from the theme
-//                Surface(
-//                    modifier = Modifier.fillMaxSize(),
-//                    color = MaterialTheme.colors.background
-//                ) {
-//                    Column {
-//                        TopAppBar(
-//                            title = {
-//                                Text(text = stringResource(id = R.string.app_name))
-//                            },
-//                            backgroundColor = MaterialTheme.colors.primary,
-//                            actions = {
-//                                DarkLightModeSwitchIcon(
-//                                    isDarkTheme = isDarkTheme,
-//                                    changeTheme = viewModel::changeTheme
-//                                )
-//                            }
-//                        )
-//                        MoviesNavGraph()
-//                    }
-//                }
-//            }
+            val viewModel by assistedViewModel {
+                mainViewModelFactory.create(it, isSystemInDarkTheme())
+            }
+
+            val isDarkTheme by viewModel.isDarkTheme.collectAsState()
+            changeStatusBarColor(isDarkTheme)
+
+            MoviesTheme(useDarkTheme = isDarkTheme) {
+                // A surface container using the 'background' color from the theme
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colors.background
+                ) {
+                    Column {
+                        TopAppBar(
+                            title = {
+                                Text(text = stringResource(id = R.string.app_name))
+                            },
+                            backgroundColor = MaterialTheme.colors.primary,
+                            actions = {
+                                DarkLightModeSwitchIcon(
+                                    isDarkTheme = isDarkTheme,
+                                    changeTheme = viewModel::changeTheme
+                                )
+                            }
+                        )
+                        MoviesNavGraph()
+                    }
+                }
+            }
         }
     }
 
