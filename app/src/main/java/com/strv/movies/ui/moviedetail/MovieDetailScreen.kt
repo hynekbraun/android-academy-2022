@@ -2,11 +2,16 @@ package com.strv.movies.ui.moviedetail
 
 import android.content.res.Configuration
 import android.util.Log
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,6 +31,7 @@ import coil.compose.AsyncImage
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+import com.strv.movies.CustomTopAppBar
 import com.strv.movies.R
 import com.strv.movies.data.OfflineMoviesProvider
 import com.strv.movies.model.MovieDetail
@@ -34,21 +40,34 @@ import com.strv.movies.ui.loading.LoadingScreen
 
 @Composable
 fun MovieDetailScreen(
-    viewModel: MovieDetailViewModel = viewModel()
+    viewModel: MovieDetailViewModel = viewModel(),
+    isDarkTheme: Boolean,
+    onChangeThemeClick: () -> Unit,
+    onNavigateBackClick: () -> Unit
 ) {
     val viewState by viewModel.viewState.collectAsState()
 
-    if (viewState.loading) {
-        LoadingScreen()
-    } else if (viewState.error != null) {
-        ErrorScreen(errorMessage = viewState.error!!)
-    } else {
-        viewState.movie?.let {
-            MovieDetail(
-                movie = it,
-                videoProgress = viewState.videoProgress,
-                setVideoProgress = viewModel::updateVideoProgress
-            )
+    Column(modifier = Modifier.fillMaxSize()) {
+        CustomTopAppBar(
+            isDarkTheme = isDarkTheme,
+            onChangeThemeClick = onChangeThemeClick,
+            showNavIcon = true,
+            modifier = Modifier
+                .padding(start = 12.dp)
+                .clickable { onNavigateBackClick() }
+        )
+        if (viewState.loading) {
+            LoadingScreen()
+        } else if (viewState.error != null) {
+            ErrorScreen(errorMessage = viewState.error!!)
+        } else {
+            viewState.movie?.let {
+                MovieDetail(
+                    movie = it,
+                    videoProgress = viewState.videoProgress,
+                    setVideoProgress = viewModel::updateVideoProgress
+                )
+            }
         }
     }
 }

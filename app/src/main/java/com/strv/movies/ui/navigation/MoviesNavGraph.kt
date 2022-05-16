@@ -14,7 +14,9 @@ import com.strv.movies.ui.movieslist.MoviesListScreen
 
 @Composable
 fun MoviesNavGraph(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    isDarkTheme: Boolean,
+    onChangeThemeClick: () -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -24,7 +26,9 @@ fun MoviesNavGraph(
             MoviesListScreen(
                 navigateToMovieDetail = { movieId ->
                     navController.navigate("${MoviesDestinations.MOVIE_DETAIL_ROUTE}/$movieId")
-                }
+                },
+                isDarkTheme = isDarkTheme,
+                onChangeThemeClick = onChangeThemeClick
             )
         }
 
@@ -36,7 +40,15 @@ fun MoviesNavGraph(
                 }
             )
         ) {
-            MovieDetailScreen()
+            MovieDetailScreen(
+                isDarkTheme = isDarkTheme,
+                onChangeThemeClick = onChangeThemeClick,
+                onNavigateBackClick = {
+                    navController.navigate(
+                        MoviesDestinations.MOVIES_LIST_ROUTE
+                    )
+                }
+            )
         }
         composable(
             route = MoviesDestinations.LOGIN_ROUTE
@@ -44,7 +56,9 @@ fun MoviesNavGraph(
             LogInScreen(
                 onLoginClick = {
                     navController.navigate(MoviesDestinations.MOVIES_LIST_ROUTE)
-                }
+                },
+                isDarkTheme = isDarkTheme,
+                onChangeThemeClick = onChangeThemeClick
             )
         }
     }

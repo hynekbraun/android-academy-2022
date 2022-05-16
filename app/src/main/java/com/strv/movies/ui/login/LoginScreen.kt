@@ -40,13 +40,16 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.strv.movies.CustomTopAppBar
 import com.strv.movies.R
 import com.strv.movies.ui.theme.login_facebookLogo
 
 @Composable
 fun LogInScreen(
     viewModel: LoginViewModel = viewModel(),
-    onLoginClick: () -> Unit
+    onLoginClick: () -> Unit,
+    isDarkTheme: Boolean,
+    onChangeThemeClick: () -> Unit
 ) {
     val viewState by viewModel.viewState.collectAsState()
 
@@ -60,159 +63,165 @@ fun LogInScreen(
     } else {
         painterResource(id = R.drawable.ic_visible)
     }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_login_logo),
-            contentDescription = "App logo",
-            modifier = Modifier.padding(top = 20.dp)
+    Column(modifier = Modifier.fillMaxSize()) {
+        CustomTopAppBar(
+            isDarkTheme = isDarkTheme,
+            onChangeThemeClick = onChangeThemeClick
         )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_login_logo),
+                contentDescription = "App logo",
+                modifier = Modifier.padding(top = 20.dp)
+            )
 
-        Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-        Text(
-            text = stringResource(R.string.login_login),
-            style = MaterialTheme.typography.h2
-        )
+            Text(
+                text = stringResource(R.string.login_login),
+                style = MaterialTheme.typography.h2
+            )
 
-        OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(0.8f),
-            value = userName,
-            onValueChange = { viewModel.updateName(it) },
-            label = {
-                Text(
-                    text = stringResource(
-                        R.string.login_username
-                    )
-                )
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_email),
-                    contentDescription = stringResource
-                        (R.string.login_contentDesc_emailIcon)
-                )
-            }
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(0.8f),
-            value = password,
-            onValueChange = { viewModel.updatePassword(it) },
-            label = {
-                Text(
-                    text = stringResource(
-                        R.string.login_password
-                    )
-                )
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            visualTransformation = if (passwordVisibility) {
-                VisualTransformation.None
-            } else {
-                PasswordVisualTransformation()
-            },
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_key),
-                    contentDescription = stringResource(
-                        R.string.login_contentDesc_passwordIcon
-                    )
-                )
-            },
-            trailingIcon = {
-                IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
-                    Icon(
-                        painter = icon,
-                        contentDescription = stringResource(
-                            R.string.login_contentDesc_visibilityIcon
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(0.8f),
+                value = userName,
+                onValueChange = { viewModel.updateName(it) },
+                label = {
+                    Text(
+                        text = stringResource(
+                            R.string.login_username
                         )
                     )
-
-                }
-            }
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(
-            onClick = {
-                if (viewModel.login()) {
-                    onLoginClick()
-                }
-            },
-            shape = MaterialTheme.shapes.medium,
-            modifier = Modifier.fillMaxWidth(0.6f)
-        ) {
-            Text(
-                text = stringResource(id = R.string.login_login),
-                modifier = Modifier.align(CenterVertically)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        ClickableText(
-            text = AnnotatedString(stringResource(R.string.login_forgotPassword)),
-            onClick = {},
-            style = TextStyle(
-                color = MaterialTheme.colors.onBackground,
-                textDecoration = TextDecoration.Underline
-            )
-        )
-        Spacer(modifier = Modifier.height(20.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(0.6f),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            IconButton(
-                onClick = { },
-                modifier = Modifier
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_login_google),
-                    contentDescription = stringResource(
-                        R.string.login_contentDesc_googleIcon
-                    ),
-                )
-            }
-
-
-            IconButton(
-                onClick = { },
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .background(color = login_facebookLogo)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_login_facebook),
-                    contentDescription = stringResource(
-                        R.string.login_contentDesc_facebookIcon
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_email),
+                        contentDescription = stringResource
+                            (R.string.login_contentDesc_emailIcon)
                     )
+                }
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(0.8f),
+                value = password,
+                onValueChange = { viewModel.updatePassword(it) },
+                label = {
+                    Text(
+                        text = stringResource(
+                            R.string.login_password
+                        )
+                    )
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                visualTransformation = if (passwordVisibility) {
+                    VisualTransformation.None
+                } else {
+                    PasswordVisualTransformation()
+                },
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_key),
+                        contentDescription = stringResource(
+                            R.string.login_contentDesc_passwordIcon
+                        )
+                    )
+                },
+                trailingIcon = {
+                    IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
+                        Icon(
+                            painter = icon,
+                            contentDescription = stringResource(
+                                R.string.login_contentDesc_visibilityIcon
+                            )
+                        )
+
+                    }
+                }
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = {
+                    if (viewModel.login()) {
+                        onLoginClick()
+                    }
+                },
+                shape = MaterialTheme.shapes.medium,
+                modifier = Modifier.fillMaxWidth(0.6f)
+            ) {
+                Text(
+                    text = stringResource(id = R.string.login_login),
+                    modifier = Modifier.align(CenterVertically)
                 )
             }
 
-        }
-        ClickableText(
-            text = AnnotatedString(stringResource(R.string.login_signup)),
-            onClick = {},
-            modifier = Modifier
-                .align(CenterHorizontally)
-                .padding(top = 20.dp),
-            style = TextStyle(
-                color = MaterialTheme.colors.onBackground,
-                textDecoration = TextDecoration.Underline
-            )
-        )
+            Spacer(modifier = Modifier.height(20.dp))
 
+            ClickableText(
+                text = AnnotatedString(stringResource(R.string.login_forgotPassword)),
+                onClick = {},
+                style = TextStyle(
+                    color = MaterialTheme.colors.onBackground,
+                    textDecoration = TextDecoration.Underline
+                )
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(0.6f),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                IconButton(
+                    onClick = { },
+                    modifier = Modifier
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_login_google),
+                        contentDescription = stringResource(
+                            R.string.login_contentDesc_googleIcon
+                        ),
+                    )
+                }
+
+
+                IconButton(
+                    onClick = { },
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .background(color = login_facebookLogo)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_login_facebook),
+                        contentDescription = stringResource(
+                            R.string.login_contentDesc_facebookIcon
+                        )
+                    )
+                }
+
+            }
+            ClickableText(
+                text = AnnotatedString(stringResource(R.string.login_signup)),
+                onClick = {},
+                modifier = Modifier
+                    .align(CenterHorizontally)
+                    .padding(top = 20.dp),
+                style = TextStyle(
+                    color = MaterialTheme.colors.onBackground,
+                    textDecoration = TextDecoration.Underline
+                )
+            )
+
+        }
     }
 }

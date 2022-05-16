@@ -8,6 +8,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
@@ -23,6 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.strv.movies.CustomTopAppBar
 import com.strv.movies.R
 import com.strv.movies.model.Movie
 import com.strv.movies.ui.error.ErrorScreen
@@ -31,10 +34,17 @@ import com.strv.movies.ui.loading.LoadingScreen
 @Composable
 fun MoviesListScreen(
     navigateToMovieDetail: (movieId: Int) -> Unit,
-    viewModel: MoviesListViewModel = viewModel()
+    viewModel: MoviesListViewModel = viewModel(),
+    isDarkTheme: Boolean,
+    onChangeThemeClick:() -> Unit
 ) {
     val viewState by viewModel.viewState.collectAsState()
 
+    Column(modifier = Modifier.fillMaxSize()) {
+        CustomTopAppBar(
+            isDarkTheme = isDarkTheme,
+            onChangeThemeClick = onChangeThemeClick
+        )
     if (viewState.loading) {
         LoadingScreen()
     } else if (viewState.error != null) {
@@ -44,6 +54,7 @@ fun MoviesListScreen(
             movies = viewState.movies,
             onMovieClick = navigateToMovieDetail
         )
+    }
     }
 }
 

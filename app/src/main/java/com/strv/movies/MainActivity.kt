@@ -7,7 +7,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -22,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.strv.movies.extension.assistedViewModel
@@ -54,50 +57,13 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     Column {
-                        TopAppBar(
-                            title = {
-                                Text(text = stringResource(id = R.string.app_name))
-                            },
-                            backgroundColor = MaterialTheme.colors.primary,
-                            actions = {
-                                DarkLightModeSwitchIcon(
-                                    isDarkTheme = isDarkTheme,
-                                    changeTheme = viewModel::changeTheme
-                                )
-                            }
-                        )
-                        MoviesNavGraph()
+                        MoviesNavGraph(isDarkTheme = isDarkTheme, onChangeThemeClick = {
+                            viewModel.changeTheme(!isDarkTheme)
+                        })
                     }
                 }
             }
         }
-    }
-
-    @Composable
-    private fun DarkLightModeSwitchIcon(
-        isDarkTheme: Boolean,
-        changeTheme: (isDarkTheme: Boolean) -> Unit
-    ) {
-        Icon(
-            modifier = Modifier
-                .padding(end = 12.dp)
-                .clickable(
-                    interactionSource = remember {
-                        MutableInteractionSource()
-                    },
-                    indication = rememberRipple(bounded = false),
-                ) {
-                    changeTheme(!isDarkTheme)
-                },
-            painter = painterResource(
-                id = if (isDarkTheme) {
-                    R.drawable.ic_light
-                } else {
-                    R.drawable.ic_dark
-                }
-            ),
-            contentDescription = null,
-        )
     }
 
     private fun changeStatusBarColor(isDarkMode: Boolean) {
@@ -107,14 +73,66 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
+fun CustomTopAppBar(
+    isDarkTheme: Boolean,
+    onChangeThemeClick: () -> Unit,
+    showNavIcon: Boolean = false,
+    modifier: Modifier = Modifier
+) {
+    TopAppBar(
+        title = {
+            Text(
+                text = stringResource(id = R.string.app_name),
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+        },
+        backgroundColor = MaterialTheme.colors.primary,
+        actions = {
+            DarkLightModeSwitchIcon(
+                isDarkTheme = isDarkTheme,
+                changeTheme = onChangeThemeClick
+            )
+        },
+        navigationIcon = {
+            if (showNavIcon) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_back),
+                    contentDescription = stringResource(
+                        R.string.detailScreen_navigateBack
+                    ),
+                    modifier = modifier
+                    )
+            }
+        }
+    )
 }
 
-@Preview(showBackground = true)
 @Composable
-fun DefaultPreview() {
-    MoviesTheme {
-        Greeting("Android")
-    }
+private fun DarkLightModeSwitchIcon(
+    isDarkTheme: Boolean,
+    changeTheme: () -> Unit
+) {
+    Icon(
+        modifier = Modifier
+            .padding(end = 12.dp)
+            .clickable(
+                interactionSource = remember {
+                    MutableInteractionSource()
+                },
+                indication = rememberRipple(bounded = false),
+            ) {
+                changeTheme()
+            },
+        painter = painterResource(
+            id = if (isDarkTheme) {
+                R.drawable.ic_light
+            } else {
+                R.drawable.ic_dark
+            }
+        ),
+        contentDescription = null,
+    )
 }
+
+
