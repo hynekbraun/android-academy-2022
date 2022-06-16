@@ -20,10 +20,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -48,6 +52,9 @@ fun LogInScreen(
     val coroutineScope = rememberCoroutineScope()
     val userName = viewState.user
     val password = viewState.password
+    val uriHandler = LocalUriHandler.current
+    val uriSignIn = stringResource(id = R.string.login_signup_link)
+    val uriPassword = stringResource(R.string.login_password_reset)
     var passwordVisibility by rememberSaveable {
         mutableStateOf(false)
     }
@@ -60,7 +67,7 @@ fun LogInScreen(
         Log.d("TAG", "launch effect launched")
         coroutineScope.launch {
             viewModel.errorFlow.collect {
-                snackBarHostState.showSnackbar(message = it)
+                snackBarHostState.showSnackbar(message = it.message)
             }
         }
     }
@@ -92,6 +99,7 @@ fun LogInScreen(
                 modifier = Modifier.fillMaxWidth(0.8f),
                 value = userName,
                 onValueChange = { viewModel.loginEvent(LoginEvent.UpdateUsername(it)) },
+                maxLines = 1,
                 label = {
                     Text(
                         text = stringResource(
@@ -102,7 +110,7 @@ fun LogInScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 leadingIcon = {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_email),
+                        imageVector = Icons.Default.Person,
                         contentDescription = stringResource
                             (R.string.login_contentDesc_emailIcon)
                     )
@@ -122,6 +130,7 @@ fun LogInScreen(
                         )
                     )
                 },
+                maxLines = 1,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 visualTransformation = if (passwordVisibility) {
                     VisualTransformation.None
@@ -130,7 +139,7 @@ fun LogInScreen(
                 },
                 leadingIcon = {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_key),
+                        imageVector = Icons.Default.Lock,
                         contentDescription = stringResource(
                             R.string.login_contentDesc_passwordIcon
                         )
@@ -168,7 +177,9 @@ fun LogInScreen(
 
             ClickableText(
                 text = AnnotatedString(stringResource(R.string.login_forgotPassword)),
-                onClick = {},
+                onClick = {
+                    uriHandler.openUri(uriPassword)
+                },
                 style = TextStyle(
                     color = MaterialTheme.colors.onBackground,
                     textDecoration = TextDecoration.Underline
@@ -180,7 +191,9 @@ fun LogInScreen(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 IconButton(
-                    onClick = { },
+                    onClick = {
+                        viewModel.loginEvent(LoginEvent.OnClickNotImplemented)
+                    },
                     modifier = Modifier
                 ) {
                     Image(
@@ -192,7 +205,9 @@ fun LogInScreen(
                 }
 
                 IconButton(
-                    onClick = { },
+                    onClick = {
+                        viewModel.loginEvent(LoginEvent.OnClickNotImplemented)
+                    },
                     modifier = Modifier
                         .clip(CircleShape)
                         .background(color = login_facebookLogo)
@@ -207,7 +222,9 @@ fun LogInScreen(
             }
             ClickableText(
                 text = AnnotatedString(stringResource(R.string.login_signup)),
-                onClick = {},
+                onClick = {
+                    uriHandler.openUri(uriSignIn)
+                },
                 modifier = Modifier
                     .align(CenterHorizontally)
                     .padding(top = 20.dp),
