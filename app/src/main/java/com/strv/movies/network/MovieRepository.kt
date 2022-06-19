@@ -1,5 +1,6 @@
 package com.strv.movies.network
 
+import android.util.Log
 import androidx.room.withTransaction
 import com.strv.movies.data.dao.MoviesDao
 import com.strv.movies.data.entity.toDomain
@@ -8,6 +9,8 @@ import com.strv.movies.extension.Either
 import com.strv.movies.model.Movie
 import com.strv.movies.model.MovieDetail
 import com.strv.movies.model.MovieDetailDTO
+import com.strv.movies.model.Trailer
+import com.strv.movies.model.toDomain
 import com.strv.movies.model.toEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -33,28 +36,40 @@ class MovieRepository @Inject constructor(
         }
     }
 
+    suspend fun fetchMovieTrailer(movieId: Int): Either<String, Trailer> {
+        Log.d("TAG", "Repository: Fetching trailer")
+        return try {
+            val trailer = api.getTrailer(movieId).trailers[0].toDomain()
+            Log.d("TRAILER", "Repository: ${trailer.key}")
+            Either.Value(trailer)
+        } catch (t: Throwable) {
+            Either.Error(t.localizedMessage ?: "Network error")
+        }
+    }
+
     suspend fun fetchPopularMovies(fetchFromRemote: Boolean): Flow<Either<String, List<Movie>>> =
         flow {
-            val localData = moviesDao.observePopularMovies().map { it.toDomain() }
-            emit(Either.Value(localData))
             val isDbEmpty = moviesDao.observePopularMovies().isEmpty()
-            val shouldLoadFromCache = !isDbEmpty && fetchFromRemote
-            if (shouldLoadFromCache) {
-                return@flow
-            }
-            try {
-                val response = api.getPopularMovies().results.map { it.toEntity() }
-
-                //could delete database here to make sure the list wont get too long
-                //but it would be a bit heavier
-
-                moviesDao.insertPopularMovies(response)
-                val cachedMovies = moviesDao.observePopularMovies()
-                    .map { it.toDomain() }
+            if (fetchFromRemote || isDbEmpty) {
+                try {
+                    val response = api.getPopularMovies().results.map { it.toEntity() }
+                    if (response.isNotEmpty()) {
+                        moviesDao.deleteMovies()
+                    }
+                    moviesDao.insertPopularMovies(response)
+                    val cachedMovies = moviesDao.observePopularMovies()
+                        .map { it.toDomain() }
+                        .sortedByDescending { it.popularity }
+                    emit(Either.Value(cachedMovies))
+                    Log.d("REFRESH", "Repository: Loaded from network")
+                } catch (t: Throwable) {
+                    emit(Either.Error(t.localizedMessage ?: "Network Error"))
+                }
+            } else {
+                val localData = moviesDao.observePopularMovies().map { it.toDomain() }
                     .sortedByDescending { it.popularity }
-                emit(Either.Value(cachedMovies))
-            } catch (t: Throwable) {
-                emit(Either.Error(t.localizedMessage ?: "Network Error"))
+                emit(Either.Value(localData))
+                Log.d("REFRESH", "Repository: Loaded from cache")
             }
         }
 
